@@ -12,6 +12,7 @@ import {
 import * as ScreenOrientation from "expo-screen-orientation";
 import { w, h } from "../../constants/responsive";
 import Sound from "react-native-sound";
+import { Link } from "expo-router";
 
 const soundFile = require("../../assets/sounds/main.mpeg");
 
@@ -115,13 +116,15 @@ const Home = () => {
               <Text style={styles.txtTitle}>
                 Mari Mengenal Flora {"\n"} dan Fauna Langka di {"\n"} Indonesia
               </Text>
-              <TouchableOpacity>
-                <Image
-                  resizeMode="contain"
-                  style={{ width: 100, marginTop: -20 }}
-                  source={require("../../assets/images/play.png")}
-                />
-              </TouchableOpacity>
+              <Link href={'/(menu)'} asChild>
+                <TouchableOpacity>
+                  <Image
+                    resizeMode="contain"
+                    style={{ width: 100, marginTop: -20 }}
+                    source={require("../../assets/images/play.png")}
+                  />
+                </TouchableOpacity>
+              </Link>
             </View>
           </View>
         </ImageBackground>
