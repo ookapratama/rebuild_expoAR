@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   TouchableOpacity,
   ImageBackground,
@@ -6,14 +7,18 @@ import {
   View,
   Image,
   Modal,
+  Alert,
 } from "react-native";
-import React, { useEffect, useState } from "react";
 import * as ScreenOrientation from "expo-screen-orientation";
 import { w, h } from "../../constants/responsive";
+import Sound from "react-native-sound";
+
+const soundFile = require("../../assets/sounds/main.mpeg");
 
 const Home = () => {
   const [modalPetunjuk, setModalPetunjuk] = useState(false);
   const [modalTentang, setModalTentang] = useState(false);
+  const [sound, setSound] = useState(null);
 
   useEffect(() => {
     const lockOrientation = async () => {
@@ -25,6 +30,37 @@ const Home = () => {
     lockOrientation();
   }, []);
 
+  const loadSound = () => {
+    // Jika suara sedang diputar, hentikan suara
+    if (sound) {
+      sound.stop(() => {
+        console.log("Sound stopped");
+        sound.release();
+        setSound(null);
+      });
+      return;
+    }
+
+    // Jika suara tidak sedang diputar, muat dan putar suara
+    const newSound = new Sound(soundFile, (error) => {
+      if (error) {
+        Alert.alert("Error", "Failed to load the sound", [{ text: "OK" }]);
+        return;
+      }
+      newSound.play((success) => {
+        if (success) {
+          console.log("Successfully finished playing");
+        } else {
+          console.log("Playback failed due to audio decoding errors");
+        }
+        newSound.release();
+        setSound(null); // Set sound kembali ke null setelah selesai diputar
+      });
+    });
+
+    setSound(newSound);
+  };
+
   return (
     <>
       <View style={styles.container}>
@@ -33,9 +69,13 @@ const Home = () => {
           resizeMode="stretch"
           source={require("../../assets/images/bg/home.png")}
         >
-          <TouchableOpacity>
+          <TouchableOpacity onPressIn={loadSound}>
             <Image
-              source={require("../../assets/images/onSound.png")}
+              source={
+                sound
+                  ? require("../../assets/images/offSound.png")
+                  : require("../../assets/images/onSound.png")
+              }
               resizeMode="contain"
               style={{
                 width: 90,
@@ -45,6 +85,7 @@ const Home = () => {
               }}
             />
           </TouchableOpacity>
+
           <View style={styles.groupBtn}>
             <View style={{ marginHorizontal: 30 }}>
               <TouchableOpacity style={styles.baseBtn}>
@@ -86,7 +127,6 @@ const Home = () => {
         </ImageBackground>
       </View>
       {/* modal 1 */}
-
       <Modal animationType="slide" transparent={true} visible={modalTentang}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -134,7 +174,6 @@ const Home = () => {
               <Text style={styles.txtPetunjuk}>
                 Cara Penggunaan Aplikasi ini :
               </Text>
-
               <Text style={styles.txtPetunjuk}>
                 1. Silahkan Pilih Tombol Play
               </Text>
